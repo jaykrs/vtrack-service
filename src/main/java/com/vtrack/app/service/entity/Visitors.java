@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Table(name = "VISITOR")
 @NamedQueries({ @NamedQuery(name = "Visitors.findAllByVendor", query = "SELECT v FROM Visitors v WHERE v.vendorId = :vendorId and v.createdBy in (:createdBy)"),
-		@NamedQuery(name = "Visitors.findAllByVendorAndDate", query = "SELECT v FROM Visitors v WHERE v.vendorId = :vendorId and v.visitDate in (:visitDate)")
+		@NamedQuery(name = "Visitors.findAllByVendorAndDate", query = "SELECT v FROM Visitors v WHERE v.vendorId = :vendorId and v.visitDate <=  :visitEDate and v.visitDate >=  :visitSDate")
 		 })
 public class Visitors implements Serializable {
 

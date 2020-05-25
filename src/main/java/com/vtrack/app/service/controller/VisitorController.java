@@ -160,17 +160,18 @@ public class VisitorController {
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 	
-	@GetMapping("/searchDate/{vendorId}/{visitDate}")
-	ResponseEntity<?> getVisitorsByCreatedIdAndDate(@PathVariable String visitDate, @PathVariable String vendorId) {
-		Date visitDt = null;
+	@GetMapping("/searchDate/{vendorId}/{visitStartDate}/{visitEndDate}")
+	ResponseEntity<?> getVisitorsByCreatedIdAndDate(@PathVariable String visitStartDate,@PathVariable String visitEndDate, @PathVariable String vendorId) {
+		Date visitSDate = null,visitEDate = null;
 		try {
-			visitDt = new SimpleDateFormat("dd-MM-yyyy").parse(visitDate);
+			visitSDate = new SimpleDateFormat("dd-MM-yyyy").parse(visitStartDate);
+			visitEDate = new SimpleDateFormat("dd-MM-yyyy").parse(visitEndDate);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Optional<List<Visitors>> visitors = visitorsRepository.findAllByVendorAndDate(vendorId, visitDt);
-		log.info("found visitors with total count" + visitors.get().size());
+		Optional<List<Visitors>> visitors = visitorsRepository.findAllByVendorAndDate(vendorId, visitSDate,visitEDate);
+	//	log.info("found visitors with total count" + visitors.get().size());
 		return visitors.map(response -> ResponseEntity.ok().body(response))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
