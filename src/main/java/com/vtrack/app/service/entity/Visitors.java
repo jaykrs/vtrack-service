@@ -92,7 +92,7 @@ public class Visitors implements Serializable {
 	private String remarks;
 	
 	@Column(name = "created_by")
-	private int createdBy;
+	private long createdBy;
 	
 	public Long getId() {
 		return id;
@@ -106,7 +106,7 @@ public class Visitors implements Serializable {
 		super();
 	}
 
-	public Visitors(String vendorId, String vendorName, int createdBy,Date visitDate, String firstName, String lastName,String phoneNo) {
+	public Visitors(String vendorId, String vendorName, long createdBy,Date visitDate, String firstName, String lastName,String phoneNo) {
 		this.vendorId = vendorId;
 		this.vendorName = vendorName;
 		this.createdBy = createdBy;
@@ -204,7 +204,7 @@ public class Visitors implements Serializable {
 	 * @return the displayName
 	 */
 	public String getDisplayName() {
-		return displayName;
+	 return initials + " " + lastName + "," + firstName;
 	}
 
 	/**
@@ -371,14 +371,14 @@ public class Visitors implements Serializable {
 	/**
 	 * @return the createdBy
 	 */
-	public int getCreatedBy() {
+	public long getCreatedBy() {
 		return createdBy;
 	}
 
 	/**
 	 * @param createdBy the createdBy to set
 	 */
-	public void setCreatedBy(int createdBy) {
+	public void setCreatedBy(long createdBy) {
 		this.createdBy = createdBy;
 	}
 

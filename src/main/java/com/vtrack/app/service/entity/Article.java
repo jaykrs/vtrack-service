@@ -16,7 +16,7 @@ import javax.persistence.Table;
 public class Article {
 
 	@Id
-	@Column(name = "ArticleId")
+	@Column(name = "Article_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
@@ -26,11 +26,8 @@ public class Article {
 	@Column(name = "Teaser")
 	private String teaser;
 
-	@Column(name = "BodyContent")
+	@Column(name = "Body_Content")
 	private String body;
-	
-	@Column(name = "MO_ID", nullable = false)
-	private String managementObject;
 
 	public long getId() {
 		return id;
@@ -64,18 +61,5 @@ public class Article {
 		this.body = body;
 	}
 
-	/**
-	 * @return the managementObject
-	 */
-	public String getManagementObject() {
-		return managementObject;
-	}
-
-	/**
-	 * @param managementObject the managementObject to set
-	 */
-	public void setManagementObject(String managementObject) {
-		this.managementObject = managementObject;
-	}
 
 }

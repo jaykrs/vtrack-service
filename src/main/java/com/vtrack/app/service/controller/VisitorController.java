@@ -2,6 +2,7 @@ package com.vtrack.app.service.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -71,7 +72,7 @@ public class VisitorController {
 		Users users = usersRepository.findByDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
 		if (null != users && users.getIsActive()) {
 		log.info("Request to add visitors: {}", json.get(ServiceConstants.PHONENO));
-		Visitors visitors = new Visitors(json.get(ServiceConstants.VENDORID),json.get(ServiceConstants.VENDORNAME),Integer.parseInt(json.get(ServiceConstants.CREATEDBY)),new Date(), json.get(ServiceConstants.FNAME),
+		Visitors visitors = new Visitors(users.getVendorId(),users.getVendorName(),users.getId(),new Timestamp(new Date().getTime()), json.get(ServiceConstants.FNAME),
 				json.get(ServiceConstants.LNAME), json.get(ServiceConstants.PHONENO));
 		
 		if (null != json.get(ServiceConstants.CITY))
@@ -95,8 +96,10 @@ public class VisitorController {
 			visitors.setCountryCode(json.get(ServiceConstants.COUNTRYCODE));
 		if (null != json.get(ServiceConstants.COUNTRY))
 			visitors.setCountry(json.get(ServiceConstants.COUNTRY));
-		if (null != json.get(ServiceConstants.INITIALS))
-			visitors.setInitials(json.get(ServiceConstants.INITIALS));
+			if (null != json.get(ServiceConstants.INITIALS))
+				visitors.setInitials(json.get(ServiceConstants.INITIALS));
+			else
+				visitors.setInitials(ServiceConstants.DEFAULTINITIALS);
 		if (null != json.get(ServiceConstants.PROFESSION))
 			visitors.setProfession(json.get(ServiceConstants.PROFESSION));
 		if (null != json.get(ServiceConstants.REMARKS))

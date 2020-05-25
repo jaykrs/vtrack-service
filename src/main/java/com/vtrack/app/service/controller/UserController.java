@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,22 +64,26 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@PostMapping("/add")
-	ResponseEntity<Users> createUser(@Valid @RequestBody Map<String, String> json,
+	ResponseEntity<?> createUser(@Valid @RequestBody Map<String, String> json,
 			HttpServletRequest request) throws URISyntaxException {
+		Users result = null;
 		log.info("Request to create user: {}", json.get(ServiceConstants.EMAILID));
-		Users user = new Users(json.get(ServiceConstants.EMAILID), json.get(ServiceConstants.FNAME),
-				json.get(ServiceConstants.LNAME), json.get(ServiceConstants.PHONENO));
-		user.setCountryCode(json.get(ServiceConstants.COUNTRYCODE));
-		user.setVendorId(json.get(ServiceConstants.VENDORID));
-		user.setVendorName(json.get(ServiceConstants.VENDORNAME));
-		user.setCreatedAt(new Date());
-		user.setIsActive(Boolean.FALSE);
-		user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
-		user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
-		Users result = usersRepository.saveAndFlush(user);
-		return ResponseEntity.created(new URI("/api/user/add/" + result.getId())).body(result);
+		if (null == usersRepository.findByEmailId(json.get(ServiceConstants.EMAILID))) {
+			Users user = new Users(json.get(ServiceConstants.EMAILID), json.get(ServiceConstants.FNAME),
+					json.get(ServiceConstants.LNAME), json.get(ServiceConstants.PHONENO));
+			user.setCountryCode(json.get(ServiceConstants.COUNTRYCODE));
+			user.setVendorId(json.get(ServiceConstants.VENDORID));
+			user.setVendorName(json.get(ServiceConstants.VENDORNAME));
+			user.setCreatedAt(new Date());
+			user.setIsActive(Boolean.FALSE);
+			user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
+			user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
+			result = usersRepository.saveAndFlush(user);
+			result.setPwd(Strings.EMPTY);
+			return ResponseEntity.created(new URI("/api/user/add/" + result.getId())).body(result);
+		}
+		return ResponseEntity.unprocessableEntity().body(json.get(ServiceConstants.EMAILID) +ServiceConstants.EMAILEXISTS);
 	}
-
 	/**
 	 * @param user
 	 * @return
