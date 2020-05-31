@@ -97,6 +97,9 @@ public class Users implements Serializable {
 	@Column(name = "created_at")
 	private Date createdAt;
 	
+	@Column(name = "activation_code", nullable = true)
+	private String activationCode;
+	
 	public Long getId() {
 		return id;
 	}
@@ -171,7 +174,7 @@ public class Users implements Serializable {
 	}
 
 	public String getDisplayName() {
-		return initials + " " + lastName + "," + firstName;
+		return null != initials ?  initials +" "+ lastName + "," + firstName : lastName + "," + firstName;
 	}
 
 	public void setDisplayName(String displayName) {
@@ -341,6 +344,20 @@ public class Users implements Serializable {
 	 */
 	public void setPincode(String pincode) {
 		this.pincode = pincode;
+	}
+
+	/**
+	 * @return the activationCode
+	 */
+	public String getActivationCode() {
+		return activationCode;
+	}
+
+	/**
+	 * @param activationCode the activationCode to set
+	 */
+	public void setActivationCode(String activationCode) {
+		this.activationCode = activationCode;
 	}
 
 	/*

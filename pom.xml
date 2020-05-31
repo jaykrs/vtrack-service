@@ -53,6 +53,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+  <dependency>
+    <groupId>com.mailjet</groupId>
+    <artifactId>mailjet-client</artifactId>
+    <version>4.2.0</version>
+  </dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk 
 		<dependency>
 			<groupId>com.amazonaws</groupId>

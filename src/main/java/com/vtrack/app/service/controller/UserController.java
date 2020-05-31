@@ -16,6 +16,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,8 @@ public class UserController {
 	@Autowired
 	private EmailInterface emailUtils;
 
+	@Autowired
+	private Environment environment;
 	/**
 	 * @param id
 	 * @return
@@ -78,8 +81,12 @@ public class UserController {
 			user.setIsActive(Boolean.FALSE);
 			user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
 			user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
+			user.setActivationCode(UUID.randomUUID().toString());
 			result = usersRepository.saveAndFlush(user);
 			result.setPwd(Strings.EMPTY);
+			String emailContent = "Click <h3><a href="+"\""+environment.getProperty("email.send.activateurl")+result.getEmailId()+"/"+result.getActivationCode()+"\""+"> vtrack activation </a></h3> to Activate";
+			emailUtils.sendMailJetEmail(ServiceConstants.USER_ACTIVATION, emailContent , result.getEmailId(), result.getDisplayName());
+			result.setActivationCode("");
 			return ResponseEntity.created(new URI("/api/user/add/" + result.getId())).body(result);
 		}
 		return ResponseEntity.unprocessableEntity().body(json.get(ServiceConstants.EMAILID) +ServiceConstants.EMAILEXISTS);
@@ -160,7 +167,8 @@ public class UserController {
 			log.info("found user with email" + email + "reset pwd reqest");
 			String _tmpPwd = UUID.randomUUID().toString().substring(0, 10);
 			int _b = usersRepository.forgetPwd(email, new String(new Base64().encode(_tmpPwd.getBytes())));
-			emailUtils.sendPlainEmail(user.getEmailId(), ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd);
+			emailUtils.sendMailJetEmail(ServiceConstants.RESET_PWD_SUBJECT, ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd, user.getEmailId(), user.getDisplayName());
+	//		emailUtils.sendPlainEmail(user.getEmailId(), ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd);
 			if (_b == 1) {
 				response.put(ServiceConstants.MSG, "Please check your " + email + " inbox for temporary password");
 			}
@@ -176,21 +184,21 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/activateUser/{email}/{activationKey}")
-	ResponseEntity<Map<String, String>> activateUser(@PathVariable String email, @PathVariable String activationKey) {
+	String activateUser(@PathVariable String email, @PathVariable String activationKey) {
 		Users user = usersRepository.findByEmailId(email);
 		Map<String, String> response = new HashMap<String, String>();
 		response.put(ServiceConstants.EMAILID, email);
 		if (null != user) {
 			log.info("found user with email " + email + " activate reqest");
-			if (activationKey.equals("key")) {
+			if (activationKey.equals(user.getActivationCode())) {
 				int _b = usersRepository.activateUser(email, Boolean.TRUE);
 				if (_b == 1) {
-					response.put(ServiceConstants.MSG, user.getDisplayName() + " activation successfull");
+					return user.getDisplayName() + " activation successfull";
 				}
 			}
 		} else {
 			response.put(ServiceConstants.MSG, HttpStatus.NOT_FOUND.toString());
 		}
-		return ResponseEntity.ok().body(response);
+		return user.getDisplayName() +" : "+ ServiceConstants.INACTIVEUSERMSG;
 	}
 }

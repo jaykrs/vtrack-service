@@ -6,7 +6,7 @@ public class ServiceConstants {
 	public static final String PWD = "pwd";
 	public static final String TOKEN = "token";
 	public static final String MSG = "rest-response";
-	public static final String TEMP_PWD_EMAIL = "Your temporary password is valid for 30 minute only : ";
+	public static final String TEMP_PWD_EMAIL = "Your temporary password is valid for few days only : ";
 	public static final String FNAME = "f_name";
 	public static final String LNAME = "l_name";
 	public static final String PHONENO = "phone_number";
@@ -34,4 +34,7 @@ public class ServiceConstants {
 	public static final String Stale = "Stale";
 	public static final String HeaderFooter = "HeaderFooter";
 	public static final String EMAILEXISTS = " is already exists , please login or reset password if forgotten";
+	public static final String RESET_PWD_SUBJECT = "Vtrack Reset Password Request";
+	public static final String USER_ACTIVATION = "vtrack user Activation Request";
+	public static final String USER_ACTIVATION_EMAIL = "";
 }
