@@ -157,7 +157,7 @@ public class VisitorController {
 
 	@GetMapping("/search/{createdBy}/{vendorId}")
 	ResponseEntity<?> getVisitorsByCreatedId(@PathVariable String createdBy, @PathVariable String vendorId) {
-		Optional<List<Visitors>> visitors = visitorsRepository.findAllByVendor(vendorId, Integer.parseInt(createdBy));
+		Optional<List<Visitors>> visitors = visitorsRepository.findAllByVendor(vendorId, Long.parseLong(createdBy));
 		log.info("found visitors with total count" + visitors.get().size());
 		return visitors.map(response -> ResponseEntity.ok().body(response))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

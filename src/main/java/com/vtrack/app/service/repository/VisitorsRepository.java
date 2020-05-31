@@ -16,6 +16,6 @@ import com.vtrack.app.service.entity.Visitors;
 public interface VisitorsRepository extends JpaRepository<Visitors, Long>{
 	List<Visitors> findByEmailId(String emailId);
 	List<Visitors> findByphone(String phone);
-	Optional<List<Visitors>> findAllByVendor(@Param("vendorId") String vendorId,@Param("createdBy") Integer createdBy);
+	Optional<List<Visitors>> findAllByVendor(@Param("vendorId") String vendorId,@Param("createdBy") Long createdBy);
 	Optional<List<Visitors>> findAllByVendorAndDate(@Param("vendorId") String vendorId, @Param("visitSDate") Date visitSDate,@Param("visitEDate") Date visitEDate);
 }
