@@ -15,6 +15,7 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 	Users findByEmailId(String emailId);
 	Users findByDeviceToken(String deviceToken);
 	Users validatePwd(@Param("email") String emailId,@Param("pwd") String pwd);
+	Users validateDeviceId(@Param("email") String emailId,@Param("deviceId") String deviceId);
 	@Transactional
 	@Modifying
 	int forgetPwd(@Param("email") String emailId,@Param("pwd") String pwd);

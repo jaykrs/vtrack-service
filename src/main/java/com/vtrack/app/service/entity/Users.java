@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 @Table(name = "USER")
 @NamedQueries({ @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
 		@NamedQuery(name = "Users.validatePwd", query = "SELECT u FROM Users u WHERE u.emailId = :email and u.pwd = :pwd"),
+		@NamedQuery(name = "Users.validateDeviceId", query = "SELECT u FROM Users u WHERE u.emailId = :email and u.deviceToken = :deviceId"),
 		@NamedQuery(name = "Users.forgetPwd", query = "UPDATE Users u SET u.pwd= :pwd WHERE u.emailId= :email"),
 		@NamedQuery(name = "Users.activateUser", query = "UPDATE Users u SET u.isActive= :activeInd WHERE u.emailId= :email"), })
 public class Users implements Serializable {

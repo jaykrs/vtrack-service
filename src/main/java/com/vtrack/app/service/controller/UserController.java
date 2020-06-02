@@ -61,6 +61,14 @@ public class UserController {
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
+	@GetMapping("/getbydevice/{emailId}/{deviceid}")
+	ResponseEntity<?> getUsersByDeviceId(@PathVariable String emailId, @PathVariable String deviceid) {
+		Users users = usersRepository.validateDeviceId(emailId,deviceid);
+		log.info("found user with id" + emailId);
+		users.setPwd("");
+		return ResponseEntity.ok().body(users);
+	}
+	
 	/**
 	 * @param user
 	 * @return
@@ -82,6 +90,8 @@ public class UserController {
 			user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
 			user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
 			user.setActivationCode(UUID.randomUUID().toString());
+			if (null != json.get(ServiceConstants.ADDRESS))
+				user.setAddress(json.get(ServiceConstants.ADDRESS));
 			result = usersRepository.saveAndFlush(user);
 			result.setPwd(Strings.EMPTY);
 			String emailContent = "Click <h3><a href="+"\""+environment.getProperty("email.send.activateurl")+result.getEmailId()+"/"+result.getActivationCode()+"\""+"> vtrack activation </a></h3> to Activate";
