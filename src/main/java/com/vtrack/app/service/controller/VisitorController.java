@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +71,14 @@ public class VisitorController {
 	ResponseEntity<?> createVisitors(@Valid @RequestBody Map<String, String> json,
 			HttpServletRequest request) throws URISyntaxException {
 		Users users = usersRepository.findByDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
-		if (null != users && users.getIsActive()) {
+		if (null != users && users.getIsActive() && users.getValidationDate().before(new Date())) {
+			log.info("User plan has been expired", users.getEmailId());
+			Map<String, String> resp = new HashMap<String, String>();
+			resp.put("response-code", ServiceConstants.USER_PLAN_EXPIRY_ERR_MSG_CODE);
+			resp.put("msg", ServiceConstants.USER_PLAN_EXPIRY_ERR_MSG);
+			return ResponseEntity.created(new URI("/api/visitors/add/")).body(resp);
+		}
+		else if (null != users && users.getIsActive() && users.getValidationDate().after(new Date())) {
 		log.info("Request to add visitors: {}", json.get(ServiceConstants.PHONENO));
 		Visitors visitors = new Visitors(users.getVendorId(),users.getVendorName(),users.getId(),new Timestamp(new Date().getTime()), json.get(ServiceConstants.FNAME),
 				json.get(ServiceConstants.LNAME), json.get(ServiceConstants.PHONENO));

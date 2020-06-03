@@ -98,6 +98,9 @@ public class Users implements Serializable {
 	@Column(name = "created_at")
 	private Date createdAt;
 	
+	@Column(name = "validation_date")
+	private Date validationDate;
+	
 	@Column(name = "activation_code", nullable = true)
 	private String activationCode;
 	
@@ -359,6 +362,20 @@ public class Users implements Serializable {
 	 */
 	public void setActivationCode(String activationCode) {
 		this.activationCode = activationCode;
+	}
+
+	/**
+	 * @return the validationDate
+	 */
+	public Date getValidationDate() {
+		return validationDate;
+	}
+
+	/**
+	 * @param validationDate the validationDate to set
+	 */
+	public void setValidationDate(Date validationDate) {
+		this.validationDate = validationDate;
 	}
 
 	/*

@@ -2,8 +2,10 @@ package com.vtrack.app.service.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +15,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.util.Strings;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +30,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+import com.razorpay.RazorpayException;
 import com.vtrack.app.service.constant.ServiceConstants;
+import com.vtrack.app.service.entity.AccountTransection;
 import com.vtrack.app.service.entity.Users;
 import com.vtrack.app.service.mail.EmailInterface;
+import com.vtrack.app.service.repository.TransectionRepository;
 import com.vtrack.app.service.repository.UsersRepository;
 
 /**
@@ -43,6 +51,8 @@ public class UserController {
 	private final Logger log = LoggerFactory.getLogger(UserController.class);
 	@Autowired
 	private UsersRepository usersRepository;
+	@Autowired
+	private TransectionRepository transectionRepository;
 	@Autowired
 	private EmailInterface emailUtils;
 
@@ -86,6 +96,8 @@ public class UserController {
 			user.setVendorId(json.get(ServiceConstants.VENDORID));
 			user.setVendorName(json.get(ServiceConstants.VENDORNAME));
 			user.setCreatedAt(new Date());
+			LocalDate lt = LocalDate.now().plusDays(ServiceConstants.USER_EXPIRATION_DATE);
+			user.setValidationDate(convertToDateViaSqlDate(lt));
 			user.setIsActive(Boolean.FALSE);
 			user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
 			user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
@@ -210,5 +222,78 @@ public class UserController {
 			response.put(ServiceConstants.MSG, HttpStatus.NOT_FOUND.toString());
 		}
 		return user.getDisplayName() +" : "+ ServiceConstants.INACTIVEUSERMSG;
+	}
+	
+	@PostMapping("/startpayment")
+	ResponseEntity<?> makePayment(@Valid @RequestBody Map<String, String> json,
+			HttpServletRequest request) throws URISyntaxException {
+	
+		Users users = usersRepository.findByEmailId(json.get(ServiceConstants.EMAILID));
+		log.info("Request to make payment by user: {}", json.get(ServiceConstants.EMAILID));
+		if (null != users && users.getIsActive()) {
+			String order_rcptid_11 = Strings.EMPTY;
+			 Order order = null;
+			try {
+				 order_rcptid_11 = UUID.randomUUID().toString().substring(0, 10);  
+				JSONObject orderRequest = new JSONObject();
+				  orderRequest.put("amount", ServiceConstants.DEFAULT_ORDER_AMT); // amount in the smallest currency unit
+				  orderRequest.put("currency", ServiceConstants.DEFAULT_ORDER_CURR);
+				  orderRequest.put("receipt", order_rcptid_11);
+				  orderRequest.put("payment_capture", Boolean.FALSE);
+				  order = new RazorpayClient(ServiceConstants.RAZORPAY_KEY, ServiceConstants.RAZORPAY_SECRET).Orders.create(orderRequest);
+				} catch (RazorpayException e) {
+				  // Handle Exception
+				  System.out.println(e.getMessage());
+				}
+			AccountTransection acctTransection = new AccountTransection(users.getId(), ServiceConstants.DEFAULT_ORDER_AMNT, new Date(), order_rcptid_11);
+			acctTransection.setStatus(Boolean.FALSE);
+			acctTransection.setCurrency(ServiceConstants.DEFAULT_ORDER_CURR);
+			acctTransection.setOrderId(order.get("id"));
+			AccountTransection result = transectionRepository.save(acctTransection);
+			return ResponseEntity.created(new URI("/api/user/startpayment/" + result.getId())).body(result);
+		}
+		return ResponseEntity.unprocessableEntity().body(json.get(ServiceConstants.EMAILID) +ServiceConstants.PAYMENT_ERROR);
+	}
+	
+	@PostMapping("/completepayment")
+	ResponseEntity<?> completePayment(@Valid @RequestBody Map<String, String> json,
+			HttpServletRequest request) throws URISyntaxException {
+	
+		Users users = usersRepository.findByEmailId(json.get(ServiceConstants.EMAILID));
+		log.info("Request to complete payment by user: {}", json.get(ServiceConstants.EMAILID));
+		String transectionId = json.get(ServiceConstants.RZPAY_TRANSECTION_ID);
+		Optional<AccountTransection> acountTransection = transectionRepository.findById(Long.parseLong(json.get(ServiceConstants.ID)));
+		if (null != users && users.getIsActive() && null != transectionId && !Strings.isEmpty(transectionId) && acountTransection.isPresent()) { 
+			AccountTransection actTransection = acountTransection.get();
+			actTransection.setTransectionId(transectionId);
+			actTransection.setStatus(Boolean.TRUE);
+			actTransection.setRemarks("payment done of " + actTransection.getAmount() +" by user "+ users.getEmailId() + " with order id " + actTransection.getOrderId());
+			Date validDate = convertToDateViaSqlDate(convertToLocalDateViaSqlDate(users.getValidationDate()).plusDays(ServiceConstants.PLAN_EXTENSION_DAYS));
+			users.setValidationDate(validDate);
+			usersRepository.saveAndFlush(users);
+			transectionRepository.saveAndFlush(actTransection);
+			return ResponseEntity.created(new URI("/api/user/completepayment/" + actTransection.getId())).body(actTransection);
+		}
+		return ResponseEntity.unprocessableEntity().body(json.get(ServiceConstants.EMAILID) +ServiceConstants.PAYMENT_COMPLETION_ERROR); 
+		
+	}
+	
+	@GetMapping("/getallpayment/{emailId}/{deviceId}")
+	ResponseEntity<?> getPaymentByUsersId(@PathVariable String emailId,@PathVariable String deviceId) {
+		Users user = usersRepository.validateDeviceId(emailId, deviceId);
+		Optional<List<AccountTransection>> accountTransectionList = null;
+		if(null != user && user.getIsActive()) 
+		accountTransectionList = transectionRepository.findByUserId(user.getId());
+//		log.info("found transection with userId" + user.getEmailId() + " count "+accountTransectionList.get().size());
+		return accountTransectionList.map(response -> ResponseEntity.ok().body(response))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	
+	}
+	public Date convertToDateViaSqlDate(LocalDate dateToConvert) {
+	    return java.sql.Date.valueOf(dateToConvert);
+	}
+	
+	public LocalDate convertToLocalDateViaSqlDate(Date dateToConvert) {
+	    return new java.sql.Date(dateToConvert.getTime()).toLocalDate();
 	}
 }

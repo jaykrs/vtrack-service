@@ -1,5 +1,7 @@
 package com.vtrack.app.service.constant;
 
+import java.util.Collection;
+
 public class ServiceConstants {
 
 	public static final String EMAILID = "emailId";
@@ -37,4 +39,17 @@ public class ServiceConstants {
 	public static final String RESET_PWD_SUBJECT = "Vtrack Reset Password Request";
 	public static final String USER_ACTIVATION = "vtrack user Activation Request";
 	public static final String USER_ACTIVATION_EMAIL = "";
+	public static final Integer USER_EXPIRATION_DATE = 10;
+	public static final String USER_PLAN_EXPIRY_ERR_MSG = "User plan has been expired";
+	public static final String USER_PLAN_EXPIRY_ERR_MSG_CODE = "1200";
+	public static final String DEFAULT_ORDER_CURR = "INR";
+	public static final String DEFAULT_ORDER_AMT = "50000";
+	public static final String RAZORPAY_KEY = "rzp_test_10eSP45VJvsTV4";
+	public static final String RAZORPAY_SECRET = "1FGS1GrMxRPvh5wn5DROKglQ";
+	public static final int DEFAULT_ORDER_AMNT = 50000;
+	public static final String PAYMENT_ERROR = "facing some issue while creating order";
+	public static final String RZPAY_TRANSECTION_ID = "transectionId";
+	public static final String PAYMENT_COMPLETION_ERROR = "payment completion error";
+	public static final long PLAN_EXTENSION_DAYS = 365;
+	
 }
