@@ -289,6 +289,16 @@ public class UserController {
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	
 	}
+	
+	@GetMapping("/logout/{emailId}/{deviceId}")
+	ResponseEntity<?> doLogout(@PathVariable String emailId,@PathVariable String deviceId) {
+		Users user = usersRepository.validateDeviceId(emailId, deviceId);
+		user.setDeviceToken(Strings.EMPTY);
+		usersRepository.saveAndFlush(user);
+		user.setPwd(Strings.EMPTY);
+		return  ResponseEntity.ok().body(user);	
+	}
+	
 	public Date convertToDateViaSqlDate(LocalDate dateToConvert) {
 	    return java.sql.Date.valueOf(dateToConvert);
 	}
