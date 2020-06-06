@@ -46,7 +46,7 @@ public class ServiceConstants {
 	public static final String DEFAULT_ORDER_AMT = "50000";
 	public static final String RAZORPAY_KEY = "rzp_test_10eSP45VJvsTV4";
 	public static final String RAZORPAY_SECRET = "1FGS1GrMxRPvh5wn5DROKglQ";
-	public static final int DEFAULT_ORDER_AMNT = 50000;
+	public static final int DEFAULT_ORDER_AMNT = 500;
 	public static final String PAYMENT_ERROR = "facing some issue while creating order";
 	public static final String RZPAY_TRANSECTION_ID = "transectionId";
 	public static final String PAYMENT_COMPLETION_ERROR = "payment completion error";

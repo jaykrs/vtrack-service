@@ -17,5 +17,6 @@ public interface VisitorsRepository extends JpaRepository<Visitors, Long>{
 	List<Visitors> findByEmailId(String emailId);
 	List<Visitors> findByphone(String phone);
 	Optional<List<Visitors>> findAllByVendor(@Param("vendorId") String vendorId,@Param("createdBy") Long createdBy);
+	Optional<List<Visitors>> findAllByVendorName(@Param("vendorId") String vendorId,@Param("createdBy") Long createdBy, @Param("visitorName") String visitorName);
 	Optional<List<Visitors>> findAllByVendorAndDate(@Param("vendorId") String vendorId, @Param("visitSDate") Date visitSDate,@Param("visitEDate") Date visitEDate);
 }

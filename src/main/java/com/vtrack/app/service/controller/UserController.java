@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -284,8 +285,9 @@ public class UserController {
 		Optional<List<AccountTransection>> accountTransectionList = null;
 		if(null != user && user.getIsActive()) 
 		accountTransectionList = transectionRepository.findByUserId(user.getId());
+		List<AccountTransection> acList = accountTransectionList.get().stream().filter(act -> act.getStatus()).collect(Collectors.toList());
 //		log.info("found transection with userId" + user.getEmailId() + " count "+accountTransectionList.get().size());
-		return accountTransectionList.map(response -> ResponseEntity.ok().body(response))
+		return accountTransectionList.map(response -> ResponseEntity.ok().body(acList))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	
 	}

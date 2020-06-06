@@ -186,4 +186,12 @@ public class VisitorController {
 		return visitors.map(response -> ResponseEntity.ok().body(response))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
+	
+	@GetMapping("/searchByName/{visitorName}/{createdBy}/{vendorId}")
+	ResponseEntity<?> getVisitorsByNameCreatedId(@PathVariable String createdBy, @PathVariable String vendorId, @PathVariable String visitorName) {
+		Optional<List<Visitors>> visitors = visitorsRepository.findAllByVendorName(vendorId, Long.parseLong(createdBy),"%"+visitorName.toLowerCase()+"%");
+		log.info("found visitors with total count" + visitors.get().size());
+		return visitors.map(response -> ResponseEntity.ok().body(response))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
 }
