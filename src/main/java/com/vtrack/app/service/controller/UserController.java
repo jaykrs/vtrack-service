@@ -103,6 +103,8 @@ public class UserController {
 			user.setDeviceToken(json.get(ServiceConstants.DEVICETOKEN));
 			user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
 			user.setActivationCode(UUID.randomUUID().toString());
+			if (null != json.get(ServiceConstants.COUNTRY))
+				user.setCountry(json.get(ServiceConstants.COUNTRY));
 			if (null != json.get(ServiceConstants.ADDRESS))
 				user.setAddress(json.get(ServiceConstants.ADDRESS));
 			result = usersRepository.saveAndFlush(user);

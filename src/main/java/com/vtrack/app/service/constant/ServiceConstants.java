@@ -43,7 +43,7 @@ public class ServiceConstants {
 	public static final String USER_PLAN_EXPIRY_ERR_MSG = "User plan has been expired";
 	public static final String USER_PLAN_EXPIRY_ERR_MSG_CODE = "1200";
 	public static final String DEFAULT_ORDER_CURR = "INR";
-	public static final String DEFAULT_ORDER_AMT = "50000";
+	public static final String DEFAULT_ORDER_AMT = "500";
 	public static final String RAZORPAY_KEY = "rzp_test_10eSP45VJvsTV4";
 	public static final String RAZORPAY_SECRET = "1FGS1GrMxRPvh5wn5DROKglQ";
 	public static final int DEFAULT_ORDER_AMNT = 50000;
