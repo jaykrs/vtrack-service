@@ -8,7 +8,7 @@ public class ServiceConstants {
 	public static final String PWD = "pwd";
 	public static final String TOKEN = "token";
 	public static final String MSG = "rest-response";
-	public static final String TEMP_PWD_EMAIL = "Your temporary password is valid for few days only : ";
+	public static final String TEMP_PWD_EMAIL = "Your temporary password is : ";
 	public static final String FNAME = "f_name";
 	public static final String LNAME = "l_name";
 	public static final String PHONENO = "phone_number";
@@ -39,14 +39,14 @@ public class ServiceConstants {
 	public static final String RESET_PWD_SUBJECT = "Vtrack Reset Password Request";
 	public static final String USER_ACTIVATION = "vtrack user Activation Request";
 	public static final String USER_ACTIVATION_EMAIL = "";
-	public static final Integer USER_EXPIRATION_DATE = 10;
+	public static final Integer USER_EXPIRATION_DATE = 90;
 	public static final String USER_PLAN_EXPIRY_ERR_MSG = "User plan has been expired";
 	public static final String USER_PLAN_EXPIRY_ERR_MSG_CODE = "1200";
 	public static final String DEFAULT_ORDER_CURR = "INR";
 	public static final String DEFAULT_ORDER_AMT = "50000";
 	public static final String RAZORPAY_KEY = "rzp_test_10eSP45VJvsTV4";
 	public static final String RAZORPAY_SECRET = "1FGS1GrMxRPvh5wn5DROKglQ";
-	public static final int DEFAULT_ORDER_AMNT = 500;
+	public static final int DEFAULT_ORDER_AMNT = 50000;
 	public static final String PAYMENT_ERROR = "facing some issue while creating order";
 	public static final String RZPAY_TRANSECTION_ID = "transectionId";
 	public static final String PAYMENT_COMPLETION_ERROR = "payment completion error";

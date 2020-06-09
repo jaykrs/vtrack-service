@@ -107,8 +107,9 @@ public class UserController {
 				user.setAddress(json.get(ServiceConstants.ADDRESS));
 			result = usersRepository.saveAndFlush(user);
 			result.setPwd(Strings.EMPTY);
-			String emailContent = "Click <h3><a href="+"\""+environment.getProperty("email.send.activateurl")+result.getEmailId()+"/"+result.getActivationCode()+"\""+"> vtrack activation </a></h3> to Activate";
-			emailUtils.sendMailJetEmail(ServiceConstants.USER_ACTIVATION, emailContent , result.getEmailId(), result.getDisplayName());
+			String actContentUrl = environment.getProperty("email.send.activateurl")+result.getEmailId()+"/"+result.getActivationCode();
+			String emailContent = environment.getProperty("email.send.activate.msg");
+			emailUtils.sendMailJetEmail(ServiceConstants.USER_ACTIVATION, emailContent.replace("ACTIVATION_URL", actContentUrl) , result.getEmailId(), result.getDisplayName());
 			result.setActivationCode("");
 			return ResponseEntity.created(new URI("/api/user/add/" + result.getId())).body(result);
 		}
@@ -190,7 +191,8 @@ public class UserController {
 			log.info("found user with email" + email + "reset pwd reqest");
 			String _tmpPwd = UUID.randomUUID().toString().substring(0, 10);
 			int _b = usersRepository.forgetPwd(email, new String(new Base64().encode(_tmpPwd.getBytes())));
-			emailUtils.sendMailJetEmail(ServiceConstants.RESET_PWD_SUBJECT, ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd, user.getEmailId(), user.getDisplayName());
+			String fwdContentUrl = environment.getProperty("email.send.forgotpwd.msg");
+			emailUtils.sendMailJetEmail(ServiceConstants.RESET_PWD_SUBJECT, fwdContentUrl.replace("RESET_PWD_MSG", ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd), user.getEmailId(), user.getDisplayName());
 	//		emailUtils.sendPlainEmail(user.getEmailId(), ServiceConstants.TEMP_PWD_EMAIL + _tmpPwd);
 			if (_b == 1) {
 				response.put(ServiceConstants.MSG, "Please check your " + email + " inbox for temporary password");
@@ -211,18 +213,19 @@ public class UserController {
 		Users user = usersRepository.findByEmailId(email);
 		Map<String, String> response = new HashMap<String, String>();
 		response.put(ServiceConstants.EMAILID, email);
+		String actContentMSG = environment.getProperty("email.send.forgotpwd.msg");
 		if (null != user) {
 			log.info("found user with email " + email + " activate reqest");
 			if (activationKey.equals(user.getActivationCode())) {
 				int _b = usersRepository.activateUser(email, Boolean.TRUE);
 				if (_b == 1) {
-					return user.getDisplayName() + " activation successfull";
+					return actContentMSG.replace("RESET_PWD_MSG", user.getDisplayName() + " activation successfull");
 				}
 			}
 		} else {
 			response.put(ServiceConstants.MSG, HttpStatus.NOT_FOUND.toString());
 		}
-		return user.getDisplayName() +" : "+ ServiceConstants.INACTIVEUSERMSG;
+		return  actContentMSG.replace("RESET_PWD_MSG",user.getDisplayName() +" : "+ ServiceConstants.INACTIVEUSERMSG);
 	}
 	
 	@PostMapping("/startpayment")
