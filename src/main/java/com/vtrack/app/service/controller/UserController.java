@@ -127,11 +127,13 @@ public class UserController {
 		String deviceId = json.get(ServiceConstants.DEVICETOKEN);
 		if (deviceId.equals(user.getDeviceToken())) {
 			log.info("Request to update user: {}", user);
+			if (null != json.get(ServiceConstants.INITIALS))
+				user.setInitials(json.get(ServiceConstants.INITIALS));
 			if (null != json.get(ServiceConstants.FNAME))
 				user.setFirstName(json.get(ServiceConstants.FNAME));
 			if (null != json.get(ServiceConstants.LNAME))
 				user.setLastName(json.get(ServiceConstants.LNAME));
-			if (null != json.get(ServiceConstants.PWD))
+			if (null != json.get(ServiceConstants.PWD) && json.get(ServiceConstants.PWD).length() > 4)
 				user.setPwd(new String(new Base64().encode(json.get(ServiceConstants.PWD).getBytes())));
 			if (null != json.get(ServiceConstants.CITY))
 				user.setCity(json.get(ServiceConstants.CITY));
